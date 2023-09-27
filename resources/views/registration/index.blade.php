@@ -40,9 +40,44 @@
                  <span class="text-danger">{{ $errors->first('password_confirmation') }}</span>
             @endif
         </div>
-        <button type="submit" class="btn btn-primary">Зареєструватися</button>
+        <button type="submit" id="registerButton" class="btn btn-primary">Зареєструватися</button>
     </form>
     <div id="registrationMessage" class="mt-3"></div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function () {
+    $('#registrationForm').on('submit', function (e) {
+        e.preventDefault(); // Забороняємо стандартну поведінку форми
+
+        var formData = $(this).serialize(); // Серіалізуємо дані форми
+
+        $.ajax({
+            type: 'POST',
+            url: '/register', // URL для обробки форми
+            data: formData,
+            success: function (data) {
+                // Виконується при успішному відправленні форми
+                $('#registrationMessage').html('<div class="alert alert-success">Реєстрація успішна!</div>');
+                $('#registrationForm')[0].reset();
+                // Перенаправити користувача на сторінку 'users'
+                window.location.href = '/users';
+            },
+            error: function (data) {
+                // Виконується при помилці відправлення форми
+                var errors = data.responseJSON;
+                var errorHtml = '<div class="alert alert-danger"><ul>';
+                $.each(errors.errors, function (key, value) {
+                    errorHtml += '<li>' + value + '</li>';
+                });
+                errorHtml += '</ul></div>';
+                $('#registrationMessage').html(errorHtml);
+            }
+        });
+    });
+});
+</script>
+
 
 @endsection
